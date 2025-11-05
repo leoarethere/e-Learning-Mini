@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
+use App\Models\Material;
+use App\Models\Discussion;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Course extends Model
 {
@@ -26,9 +29,14 @@ class Course extends Model
         return $this->hasMany(Discussion::class);
     }
 
+    /**
+     * GANTI metode lama 'enrolledStudents' dengan yang ini.
+     * Ini adalah relasi Many-to-Many ke User,
+     * tapi kita filter agar HANYA mengembalikan user dengan role 'mahasiswa'.
+     */
     public function enrolledStudents()
     {
-        // Ini contoh sederhana, bisa dikembangkan dengan tabel enrollment
-        return User::where('role', 'mahasiswa')->get();
+        return $this->belongsToMany(User::class, 'course_user')
+                    ->where('role', 'mahasiswa');
     }
 }

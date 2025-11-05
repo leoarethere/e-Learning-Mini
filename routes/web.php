@@ -1,14 +1,16 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\MaterialController;
-use App\Http\Controllers\DiscussionController;
-use App\Http\Controllers\ProgressController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,9 +19,28 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     /** @var \App\Models\User|null $user */
     $user = Auth::user();
+
     if ($user && $user->isAdmin()) {
         return redirect()->route('admin.dashboard');
     }
+
+    // --- LOGIKA BARU ---
+    // Jika user adalah mahasiswa, tampilkan kursus yang diikutinya
+    if ($user && $user->isMahasiswa()) {
+        $courses = $user->enrolledCourses()->with('lecturer')->latest()->get();
+        // Kita gunakan view yang sama dengan 'courses.index'
+        return view('courses.index', compact('courses'));
+    }
+    
+    // Jika Dosen, tampilkan semua kursus (atau kursus yang dia ajar)
+    if ($user && $user->isDosen()) {
+        // Mari kita tampilkan semua kursus untuk dosen untuk saat ini
+        // Nanti kita bisa filter hanya kursus yang dia ajar
+        $courses = Course::with(['lecturer', 'materials'])->get();
+        return view('courses.index', compact('courses'));
+    }
+    
+    // Fallback default dashboard jika terjadi kesalahan (seharusnya tidak terjadi)
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -63,13 +84,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     
-    // Course Management (uncomment when AdminCourseController is created)
-    // Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
-    // Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
-    // Route::post('/courses', [AdminCourseController::class, 'store'])->name('courses.store');
-    // Route::get('/courses/{course}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
-    // Route::put('/courses/{course}', [AdminCourseController::class, 'update'])->name('courses.update');
-    // Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+    Route::get('/courses', [AdminCourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create', [AdminCourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [AdminCourseController::class, 'store'])->name('courses.store');
+    Route::get('/courses/{course}/edit', [AdminCourseController::class, 'edit'])->name('courses.edit');
+    Route::put('/courses/{course}', [AdminCourseController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+
+    // Enrollment Management
+    Route::get('/courses/{course}/enrollments', [AdminCourseController::class, 'manageEnrollments'])->name('courses.enrollments');
+    Route::post('/courses/{course}/enrollments', [AdminCourseController::class, 'updateEnrollments'])->name('courses.enrollments.update');
 });
 
 require __DIR__.'/auth.php';

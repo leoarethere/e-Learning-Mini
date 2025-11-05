@@ -1,55 +1,48 @@
-@extends('layouts.app')
+<x-admin-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Edit User: ') . $user->name }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Edit User')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <form action="{{ route('admin.users.update', $user) }}" method="POST">
+                        @csrf
+                        @method('PUT')
 
-@section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Edit User</h1>
-    
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Edit Data User</h5>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.users.update', $user) }}" method="POST">
-                @csrf
-                @method('PUT')
-                
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nama</label>
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                           id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                    @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                        <div>
+                            <x-input-label for="name" :value="__('Name')" />
+                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $user->name)" required autofocus />
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="email" :value="__('Email')" />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $user->email)" required />
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="role" :value="__('Role')" />
+                            <select name="role" id="role" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="mahasiswa" @selected(old('role', $user->role) == 'mahasiswa')>Mahasiswa</option>
+                                <option value="dosen" @selected(old('role', $user->role) == 'dosen')>Dosen</option>
+                                <option value="admin" @selected(old('role', $user->role) == 'admin')>Admin</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                        </div>
+
+                        <div class="flex items-center justify-end mt-4">
+                            <x-primary-button>
+                                {{ __('Update User') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                           id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                    @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="mb-3">
-                    <label for="role" class="form-label">Role</label>
-                    <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
-                        <option value="dosen" {{ old('role', $user->role) == 'dosen' ? 'selected' : '' }}>Dosen</option>
-                        <option value="mahasiswa" {{ old('role', $user->role) == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                    </select>
-                    @error('role')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Kembali</a>
-                    <button type="submit" class="btn btn-primary">Update User</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-@endsection
+</x-admin-layout>

@@ -1,49 +1,21 @@
-@extends('layouts.app')
+<x-admin-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Activity Monitoring') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Monitoring Aktivitas')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-medium">User Logins</h3>
+                    <p>(Fitur monitoring belum diimplementasikan)</p>
 
-@section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Monitoring Aktivitas Mahasiswa</h1>
-    
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Progress Belajar Mahasiswa</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Nama Mahasiswa</th>
-                            <th>Email</th>
-                            <th>Materi Diselesaikan</th>
-                            <th>Total Materi</th>
-                            <th>Progress</th>
-                            <th>Persentase</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($students as $student)
-                        <tr>
-                            <td>{{ $student->name }}</td>
-                            <td>{{ $student->email }}</td>
-                            <td>{{ $student->completed_materials }}</td>
-                            <td>{{ $materialsCount }}</td>
-                            <td>
-                                <div class="progress" style="height: 20px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                         style="width: {{ $student->completion_rate }}%">
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{{ round($student->completion_rate, 1) }}%</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    <h3 class="text-lg font-medium mt-6">Course Activity</h3>
+                    <p>(Fitur monitoring belum diimplementasikan)</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-admin-layout>

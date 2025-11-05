@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Course;
+use App\Models\Progress;
+use App\Models\Discussion;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -30,11 +33,27 @@ class User extends Authenticatable
         ];
     }
 
-    // Relationships
-    public function courses()
+    /**
+     * Kursus yang diajar oleh user ini (jika user adalah Dosen).
+     */
+    public function taughtCourses()
     {
+        // Ganti nama relasi 'courses()' lama Anda menjadi ini
         return $this->hasMany(Course::class, 'lecturer_id');
     }
+
+    /**
+     * Kursus yang diikuti oleh user ini (jika user adalah Mahasiswa).
+     */
+    public function enrolledCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user');
+    }
+
+    /**
+     * Relasi lama 'courses()' sudah diganti dengan 'taughtCourses()'
+     * Kita hapus/ganti nama 'public function courses()'
+     */
 
     public function discussions()
     {

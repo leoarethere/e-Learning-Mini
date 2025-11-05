@@ -1,69 +1,55 @@
-@extends('layouts.app')
+<x-admin-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Edit Kursus: ') . $course->name }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Edit Mata Kuliah')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <form action="{{ route('admin.courses.update', $course) }}" method="POST">
+                        @csrf
+                        @method('PUT') <div>
+                            <x-input-label for="name" :value="__('Nama Kursus')" />
+                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $course->name)" required autofocus />
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                        </div>
 
-@section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Edit Mata Kuliah</h1>
-    
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Edit Data Mata Kuliah</h5>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.courses.update', $course) }}" method="POST">
-                @csrf
-                @method('PUT')
-                
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nama Mata Kuliah</label>
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                           id="name" name="name" value="{{ old('name', $course->name) }}" required>
-                    @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                        <div class="mt-4">
+                            <x-input-label for="code" :value="__('Kode Kursus (cth: TI-101)')" />
+                            <x-text-input id="code" class="block mt-1 w-full" type="text" name="code" :value="old('code', $course->code)" required />
+                            <x-input-error :messages="$errors->get('code')" class="mt-2" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="description" :value="__('Deskripsi')" />
+                            <textarea name="description" id="description" rows="5" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('description', $course->description) }}</textarea>
+                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="lecturer_id" :value="__('Dosen Pengampu')" />
+                            <select name="lecturer_id" id="lecturer_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">-- Pilih Dosen --</option>
+                                @foreach ($dosens as $dosen)
+                                    <option value="{{ $dosen->id }}" @selected(old('lecturer_id', $course->lecturer_id) == $dosen->id)>
+                                        {{ $dosen->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('lecturer_id')" class="mt-2" />
+                        </div>
+
+                        <div class="flex items-center justify-end mt-4">
+                            <x-primary-button>
+                                {{ __('Update Kursus') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="code" class="form-label">Kode Mata Kuliah</label>
-                    <input type="text" class="form-control @error('code') is-invalid @enderror" 
-                           id="code" name="code" value="{{ old('code', $course->code) }}" required>
-                    @error('code')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="mb-3">
-                    <label for="description" class="form-label">Deskripsi</label>
-                    <textarea class="form-control @error('description') is-invalid @enderror" 
-                              id="description" name="description" rows="3" required>{{ old('description', $course->description) }}</textarea>
-                    @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="mb-3">
-                    <label for="lecturer_id" class="form-label">Dosen Pengampu</label>
-                    <select class="form-select @error('lecturer_id') is-invalid @enderror" 
-                            id="lecturer_id" name="lecturer_id" required>
-                        <option value="">Pilih Dosen</option>
-                        @foreach($lecturers as $lecturer)
-                        <option value="{{ $lecturer->id }}" {{ old('lecturer_id', $course->lecturer_id) == $lecturer->id ? 'selected' : '' }}>
-                            {{ $lecturer->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @error('lecturer_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.courses.index') }}" class="btn btn-secondary">Kembali</a>
-                    <button type="submit" class="btn btn-primary">Update Mata Kuliah</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-@endsection
+</x-admin-layout>
